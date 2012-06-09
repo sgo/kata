@@ -8,7 +8,7 @@ class PrimeFactors {
     private static class PrimeFactorsCalculator {
         def factors = []
         def factor = 1
-        BigInteger number
+        double number
 
         def getFactors() {
             while (notAllFactorsFound()) {
