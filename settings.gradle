@@ -1,1 +1,1 @@
-include 'files'
+include 'files', 'primefactors'
