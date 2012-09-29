@@ -6,7 +6,7 @@ import spock.lang.Specification
  * 1. empty string => 0
  * 2. "1" => 1
  * 3. "1,2" => 3
- * 4. "2\n3" => 4
+ * 4. "2\n3" => 5
  * 5. "1,2\n3" => 6
  * 6. "//#\n1#2" => 3
  * 7. "//?\n1?2" => 3
@@ -19,8 +19,35 @@ import spock.lang.Specification
  */
 class StringCalculatorSpec extends Specification {
 
-    def "test"() {
+    private StringCalculator calculator = new StringCalculator()
+
+    def "calculations"() {
         expect:
-        false
+        calculator.run(input) == result
+
+        where:
+        input      | result
+        ""         | 0
+        "1"        | 1
+        "1,2"      | 3
+        "2\n3"     | 5
+        "1,2\n3"   | 6
+        "//#\n1#2" | 3
+        "//?\n1?2" | 3
+//        "1,1001,2" | 3
     }
+
+
+    def "testing Exceptions" () {
+        given:
+        def input = "-1"
+
+        when:
+        calculator.run(input)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
+
 }
