@@ -31,6 +31,18 @@ class AcceptanceScenarioSpec extends Specification {
     }
 
     @Ignore
+    def "a puppet which moves left for 5 ticks of world time"() {
+        given:
+        puppet.brain << moveLeftWith(puppet)
+
+        when:
+        limit(world, ticks).each {}
+
+        then:
+        puppet.coords.x == -1 * puppet.runningSpeed.multiplier * ticks
+    }
+
+    @Ignore
     def "a puppet which tries to move right with a block barring his way"() {
         expect:
         false

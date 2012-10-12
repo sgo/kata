@@ -14,8 +14,10 @@ import spock.lang.Specification
  * 9. "1,1001,2" => 3
  * 10. "//[###]\n1###2" => 3
  * 11. "//[***]\n1***2" => 3
- * 12. "//[#][%]\n1#2%3" => 6
- * 13. "//[###][%%%]\n1###2%%%3" => 6
+ * 12. "//[[]]\n1[]2" => 3
+ * 13. "//[#][%]\n1#2%3" => 6
+ * 14. "//[[]][*]\n1[]2*3 => 6
+ * 14. "//[###][%%%]\n1###2%%%3" => 6
  */
 class StringCalculatorSpec extends Specification {
 
@@ -26,19 +28,26 @@ class StringCalculatorSpec extends Specification {
         calculator.run(input) == result
 
         where:
-        input      | result
-        ""         | 0
-        "1"        | 1
-        "1,2"      | 3
-        "2\n3"     | 5
-        "1,2\n3"   | 6
-        "//#\n1#2" | 3
-        "//?\n1?2" | 3
-//        "1,1001,2" | 3
+        input             | result
+        ""                | 0
+        "1"               | 1
+        "1,2"             | 3
+        "2\n3"            | 5
+        "1,2\n3"          | 6
+        "//#\n1#2"        | 3
+        "//?\n1?2"        | 3
+        "1,1001,2"        | 3
+        "1,1000,2"        | 1003
+        "//[###]\n1###2"  | 3
+        "//[***]\n1***2"  | 3
+        "//[[]\n1[2"      | 3
+        "//[]]\n1]2"      | 3
+        "//[[]]\n1[]2"    | 3
+        "//[[]]]\n1[]]2"  | 3
+        "//[#][%]\n1#2%3" | 6
     }
 
-
-    def "testing Exceptions" () {
+    def "testing Exceptions"() {
         given:
         def input = "-1"
 
@@ -48,6 +57,4 @@ class StringCalculatorSpec extends Specification {
         then:
         thrown IllegalArgumentException
     }
-
-
 }
