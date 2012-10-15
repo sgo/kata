@@ -58,54 +58,84 @@ class StringCalculator {
     }
 
     private List<String> extractMultiChar(String delimiter) {
-        // [#][%]   [[]     []]    [[]]    [[]]]
-//        [delimiter.substring(1, delimiter.length() - 1)]
-//        def chars = delimiter.chars as List
-//        chars.inject("") {delim, c->
-//            delim + (c == "[" ? "" : c)
-//        }
-        List<String> list = []
-        def oneDelimiter = [] as List<String>
-        for (int i = 0; i < delimiter.length(); i++) {
-            if (delimiter[i].equals('[')) {
-                oneDelimiter << extractFirstChar(delimiter, ++i)
-
-                i = readCharsUpToFirstClosingBracket(oneDelimiter, delimiter, i)
-
-                oneDelimiter << continueUpToLastClosingBracket(delimiter, i).join('')
-                i += oneDelimiter.last().length()+1
-            } else {
-                oneDelimiter << delimiter[i]
-            }
-            list.add(oneDelimiter.join(''))
-            oneDelimiter = []
-        }
-        return list
-    }
-
-    private int readCharsUpToFirstClosingBracket(List<String> oneDelimiter, String delimiter, int charsRead) {
-        while (!delimiter[++charsRead].equals(']')) oneDelimiter << delimiter[charsRead]
-        return charsRead
-    }
-
-    private List continueUpToLastClosingBracket(String delimiter, int i) {
-        def s3 = []
-        if (delimiter[i].equals(']')) {
-            while (i < delimiter.length() - 1 && delimiter[++i].equals(']')) {
-                if (i < delimiter.length()) {   // "123" 012 3
-                    s3 << delimiter[i]
-                }
-            }
-        }
-        return s3
-    }
-
-
-    private String extractFirstChar(String delimiter, int i) {
-        delimiter[i]
+        new DelimiterExtractor(delimiterLine: delimiter).extract()
     }
 
     private boolean userDefinedDelimitersOn(String input) {
         input.startsWith(userDefinedDelimiterMark)
+    }
+
+    private static class DelimiterExtractor {
+        String delimiterLine
+        int currentChar
+        List<String> bufferedDelimiter = []
+        List<String> delimiters = []
+
+        public List extract() {
+            // TODO google: uncle bob extract method object
+            while (anyCharactersLeft()) {
+                delimiters << extractDelimiter()
+                resetBuffer()
+            }
+            return delimiters
+        }
+
+        private String extractDelimiter() {
+            multiCharDelimiter ? extractMultiCharDelimiter() : extractOneCharDelimiter()
+            bufferedDelimiter.join('')
+        }
+
+        private void resetBuffer() {
+            bufferedDelimiter = []
+            currentChar++
+        }
+
+        private boolean isMultiCharDelimiter() {
+            delimiterLine[currentChar].equals('[')
+        }
+
+        private void extractMultiCharDelimiter() {
+            while (isNotClosingChar(nextChar) || isMultipleClosingChars()) {
+                currentChar++
+                readChar()
+            }
+            // [###][%%%]    [[]][[[]]]
+        }
+
+        private boolean isMultipleClosingChars() {
+            isNotCharNearEnd() && isClosingChar(nextChar+1)
+        }
+
+        private boolean isNotCharNearEnd() {
+            currentChar < delimiterLine.length() - 2
+        }
+
+        private void readChar() {
+            if (anyCharactersLeft()) {
+                bufferedDelimiter << delimiterLine[currentChar]
+            }
+        }
+
+        private void extractOneCharDelimiter() {
+            bufferedDelimiter << delimiterLine[currentChar]
+        }
+
+
+
+        private boolean isNotClosingChar(int index) {
+            !isClosingChar(index)
+        }
+
+        private boolean isClosingChar(int index) {
+            delimiterLine[index].equals(']')
+        }
+
+        private int getNextChar() {
+            currentChar + 1
+        }
+
+        private boolean anyCharactersLeft() {
+            currentChar < delimiterLine.length()
+        }
     }
 }

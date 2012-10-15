@@ -1,1 +1,1 @@
-include 'files', 'primefactors', 'game'
+include 'files', 'primefactors', 'game' , 'stringcalculator'
