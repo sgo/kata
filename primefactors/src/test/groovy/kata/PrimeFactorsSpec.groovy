@@ -20,4 +20,9 @@ import spock.lang.Specification
  * 2**31-1 => [2**31-1]
  */
 class PrimeFactorsSpec extends Specification {
+
+    def "test"() {
+        expect:
+        false
+    }
 }
