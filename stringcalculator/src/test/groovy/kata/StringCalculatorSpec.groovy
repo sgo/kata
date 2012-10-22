@@ -24,7 +24,6 @@ class StringCalculatorSpec extends Specification {
 
     private StringCalculator calculator = new StringCalculator()
 
-    @Unroll
     def "calculations"() {
         expect:
         calculator.run(input) == result
