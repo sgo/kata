@@ -1,1 +1,1 @@
-include 'files', 'primefactors'
+include 'files', 'primefactors', 'multipleinheritence'
