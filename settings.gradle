@@ -1,1 +1,1 @@
-include 'files', 'primefactors', 'multipleinheritence'
+include 'files', 'primefactors', 'romannumerals', 'stringcalculator', 'multipleinheritence'
