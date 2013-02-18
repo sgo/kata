@@ -6,23 +6,24 @@ class RomanNumeralsSpec extends Specification {
     def "to roman numerals"() {
         given:
         def converter = new Converter()
-        converter.inputZero = 0
-        converter.outputZero = ''
-        converter.predicateFactory = { n -> return { n >= it.key } }
+        converter.zero = ''
+        converter.isZero = { it > 0 }
+        converter.isLargest = { x, y -> x >= y }
+        converter.sorter = { x, y -> (x.key <=> y.key) * -1 }
         converter.map = [
-                1000: 'M',
-                900: 'CM',
                 500: 'D',
-                400: 'CD',
                 100: 'C',
                 90: 'XC',
-                50: 'L',
-                40: 'XL',
                 10: 'X',
-                9: 'IX',
-                5: 'V',
+                50: 'L',
+                900: 'CM',
+                1: 'I',
+                40: 'XL',
                 4: 'IV',
-                1: 'I'
+                400: 'CD',
+                9: 'IX',
+                1000: 'M',
+                5: 'V'
         ]
 
         expect:
@@ -41,7 +42,6 @@ class RomanNumeralsSpec extends Specification {
         8     | 'VIII'
         9     | 'IX'
         10    | 'X'
-        11    | 'XI'
         40    | 'XL'
         50    | 'L'
         90    | 'XC'
@@ -50,27 +50,21 @@ class RomanNumeralsSpec extends Specification {
         500   | 'D'
         900   | 'CM'
         1000  | 'M'
-        1903  | 'MCMIII'
-        1954  | 'MCMLIV'
-        1990  | 'MCMXC'
+        1910  | 'MCMX'
     }
 
-    def "from roman numerals"() {
+    def "from roman numeral"() {
         given:
         def converter = new Converter()
-        converter.inputZero = ''
-        converter.outputZero = 0
-        converter.predicateFactory = { n -> return { n.startsWith(it.key) } }
+        converter.zero = 0
+        converter.isZero = { !it.isEmpty() }
+        converter.isLargest = { x, y -> x.startsWith(y) }
+        converter.sorter = { x, y -> (x.value <=> y.value) * -1 }
         converter.map = [
-                'C': 100,
-                'XC': 90,
-                'L': 50,
-                'XL': 40,
-                'X': 10,
+                'I': 1,
                 'IX': 9,
-                'V': 5,
                 'IV': 4,
-                'I': 1
+                'V': 5
         ]
 
         expect:
@@ -80,53 +74,56 @@ class RomanNumeralsSpec extends Specification {
         input  | output
         ''     | 0
         'I'    | 1
-        'II'   | 2
-        'III'  | 3
         'IV'   | 4
         'V'    | 5
-        'VI'   | 6
-        'VII'  | 7
         'VIII' | 8
         'IX'   | 9
-        'X'    | 10
-        'XL'   | 40
-        'L'    | 50
-        'XC'   | 90
-        'C'    | 100
     }
 
-    def "atm"() {
+    def "automated teller machine"() {
         given:
-        def converter = new Converter()
-        converter.inputZero = 0
-        converter.outputZero = []
-        converter.predicateFactory = { n -> return { n >= it.key } }
-        converter.map = [
-                10: [10],
-                5: [5]
-        ]
+        Converter converter = createATMConverter()
 
         expect:
         converter.convert(input) == output
 
         where:
         input | output
+        0     | []
         5     | [5]
         10    | [10]
         15    | [10, 5]
     }
 
+    private Converter createATMConverter() {
+        def converter = new Converter()
+        converter.zero = []
+        converter.isZero = { it > 0 }
+        converter.isLargest = { x, y -> x >= y }
+        converter.sorter = { x, y -> (x.key <=> y.key) * -1 }
+        converter.map = [
+                10: [10],
+                5: [5]
+        ]
+        converter
+    }
+
     class Converter {
         def map
-        def inputZero
-        def outputZero
-        def predicateFactory
+        def zero
+        def isZero
+        def isLargest
+        def sorter
 
-        def convert(n) { n == inputZero ? outputZero : reduce(n) }
+        def convert(input) {
+            if (isZero(input)) {
+                def largest = map.find { isLargest(input, it.key) }
+                return largest.value + convert(input - largest.key)
+            } else return zero
+        }
 
-        private def reduce(n) {
-            def r = map.entrySet().find(predicateFactory(n))
-            r.value + convert(n - r.key)
+        void setMap(map) {
+            this.map = (map.entrySet() as List).sort(sorter)
         }
     }
 }
