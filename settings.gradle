@@ -1,1 +1,1 @@
-include 'files', 'primefactors', 'romannumerals', 'stringcalculator'
+include 'pony-independent'

@@ -1,5 +1,4 @@
 subprojects {
-    apply plugin:'eclipse'
     apply plugin:'idea'
     apply plugin:'groovy'
     
@@ -8,12 +7,13 @@ subprojects {
     
     repositories {
         mavenCentral()
-        mavenRepo urls:"http://m2repo.spockframework.org/snapshots"
     }
     
     dependencies {
-        groovy 'org.codehaus.groovy:groovy:latest.release'
+        groovy 'org.codehaus.groovy:groovy:1.8.6'
         testCompile 'junit:junit:latest.release'
-        testCompile "org.spockframework:spock-core:latest.release"
+        testCompile "org.spockframework:spock-core:0.7-groovy-1.8", {
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        }
     }
 }
