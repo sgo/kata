@@ -1,1 +1,1 @@
-include 'pony-independent'
+include 'pony-independent', 'replayer'

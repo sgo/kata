@@ -10,9 +10,9 @@ subprojects {
     }
     
     dependencies {
-        groovy 'org.codehaus.groovy:groovy:1.8.6'
+        groovy 'org.codehaus.groovy:groovy:2.2.1'
         testCompile 'junit:junit:latest.release'
-        testCompile "org.spockframework:spock-core:0.7-groovy-1.8", {
+        testCompile "org.spockframework:spock-core:0.7-groovy-2.0", {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
     }
